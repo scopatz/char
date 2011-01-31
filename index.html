@@ -1,0 +1,162 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to the Char documentation! &mdash; char v0.15 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.15',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="char v0.15 documentation" href="#" />
+    <link rel="next" title="Contact Info" href="contact.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="contact.html" title="Contact Info"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">char v0.15 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-the-char-documentation">
+<h1>Welcome to the Char documentation!<a class="headerlink" href="#welcome-to-the-char-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Cross-sections Have Awesome Rates (CHAR) is a Python program that computes neutron cross-sections
+as a function of time interned in a nuclear power reactor.</p>
+<p>The underlying model that is used is the neutron transport code <a class="reference external" href="http://montecarlo.vtt.fi/">Serpent</a>
+for all available isotopes.  If a nuclide is not present in Serpent&#8217;s ACE database, physical
+cross section models are used instead.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unfortunately, the present version of Serpent  is not sufficient to calculate the group-to-group
+scattering cross-section for a single material.  To rectify this, the author has a development
+patch to Serpent that Char requires to run correctly.  This patch is available upon request.
+Additionally, the patch has been submitted upstream so hopefully future versions of Serpent will
+include this capability.</p>
+</div>
+<dl class="docutils">
+<dt>Char currently has the following dependencies:</dt>
+<dd><ol class="first last arabic simple">
+<li><a class="reference external" href="http://numpy.scipy.org/">NumPy</a></li>
+<li><a class="reference external" href="http://www.scipy.org/">SciPy</a></li>
+<li><a class="reference external" href="http://www.pytables.org/">PyTables</a></li>
+<li>MetaSci</li>
+<li>Bright</li>
+<li><a class="reference external" href="http://montecarlo.vtt.fi/">Serpent</a></li>
+<li><a class="reference external" href="http://code.enthought.com/projects/index.php">Enthought Tool Suite</a> (Optional, for UI)</li>
+</ol>
+</dd>
+</dl>
+<p>The source code for char may be found at the
+<a class="reference external" href="http://github.com/scopatz/char">GitHub project site</a>.
+Or you may simply clone from the master using git:</p>
+<div class="highlight-python"><pre>git clone git://github.com/scopatz/char.git</pre>
+</div>
+<p>No Windows builds are currently available because much of the design assumes a posix environment.
+However, with some refactoring, a Windows version should be possible.  Please contact me
+if you are interested in this feature set.</p>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact Info</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="helpful-links">
+<h1>Helpful Links<a class="headerlink" href="#helpful-links" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/CharIconSmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to the Char documentation!</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpful-links">Helpful Links</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="contact.html"
+                        title="next chapter">Contact Info</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="contact.html" title="Contact Info"
+             >next</a> |</li>
+        <li><a href="#">char v0.15 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Anthony Scopatz.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>
