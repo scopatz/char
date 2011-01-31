@@ -1,0 +1,10 @@
+# Ignore build files
+doc/build/
+build/
+*egg-info/
+
+# Ignore non-source files
+*.pyc
+*.save
+*.bak
+
