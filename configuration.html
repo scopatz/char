@@ -1,0 +1,223 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Char Configuration &mdash; char v0.15 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.15',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="char v0.15 documentation" href="index.html" />
+    <link rel="next" title="Contact Info" href="contact.html" />
+    <link rel="prev" title="Runtime Options" href="runtime.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="contact.html" title="Contact Info"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="runtime.html" title="Runtime Options"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">char v0.15 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="char-configuration">
+<h1>Char Configuration<a class="headerlink" href="#char-configuration" title="Permalink to this headline">¶</a></h1>
+<p>Char is highly configurable, which enables easy small and large changes to the reactor of interest.
+All of char&#8217;s configuration parameters are stored in a file, which is by default called <tt class="docutils literal"><span class="pre">defchar.py</span></tt>.
+However, the path to this definition file is given as a runtime argument, so the file may have any name.</p>
+<p>As its name implies, <tt class="docutils literal"><span class="pre">defchar.py</span></tt> is a python module that serves as a cookie jar for all of the
+parameters used.  Because it is a python file and is executed at runtime, the underlying variables
+that char uses may be calculated in as complex or as simple a way as the user desires.  Here,
+only simple examples will be demonstrated.</p>
+<p>Char also comes with a variety of default parameters.  In some cases, these defaults may be imported
+directly into <tt class="docutils literal"><span class="pre">defchar.py</span></tt>.  In other instances, defaults are selected automatically if a value is
+not provided.</p>
+<p>What follows is an explanation of all of the input paramters that may be specified in a <tt class="docutils literal"><span class="pre">defchar.py</span></tt>
+file.</p>
+<div class="section" id="general-specification">
+<h2>General Specification<a class="headerlink" href="#general-specification" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>reactor</strong> (str): A string name for the reactor.  This is used as an identified throughout
+much of char.  Only letters and underscores are valid characters.  Exmples include
+<tt class="docutils literal"><span class="pre">&quot;lwr&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;fast_reactor&quot;</span></tt>, and <tt class="docutils literal"><span class="pre">&quot;LWR_more_perts&quot;</span></tt>.</li>
+<li><strong>burn_regions</strong> (int): This specifies the number of annular burn regions in a fuel pin.
+The absolut minimum number is 1, however three to four are probably required for decent statistics.
+The serpent manual recomends ten.</li>
+<li><strong>burn_time</strong> (int or float): This is the total time, in days, that all burnup calculations should
+be run for. As such, it is a surrogate for the fluence.  For a light water reactor, a value of
+<tt class="docutils literal"><span class="pre">4200</span></tt> is a decent guess.  Generally, you want to overshoot rather than undershoot this value.</li>
+<li><strong>time_step</strong> (int or float): Time step by which to increment <tt class="docutils literal"><span class="pre">burn_time</span></tt>.  The code generally
+works best when <tt class="docutils literal"><span class="pre">(0</span> <span class="pre">==</span> <span class="pre">burn_time</span> <span class="pre">%</span> <span class="pre">time_step)</span></tt>.  It is usually better to guess smaller values
+for this parameter rather than larger ones.</li>
+<li><strong>email</strong> (str): An email address to send runtime updates to, &#8220;<a class="reference external" href="mailto:char&#37;&#52;&#48;zeon&#46;com">char<span>&#64;</span>zeon<span>&#46;</span>com</a>&#8221;.</li>
+<li><strong>scheduler</strong> (str): If present, this value specifices which scheduler to use.  Accepted values include
+an empty string <tt class="docutils literal"><span class="pre">''</span></tt> to indicate no scheduler and <tt class="docutils literal"><span class="pre">&quot;PBS&quot;</span></tt> to use the torque scheduler.</li>
+<li><strong>number_cpus</strong> (int): This is the number of CPUs to run the transport code on if parallel processing
+is available.</li>
+<li><strong>cpus_per_node</strong> (int): If being run on a cluster, this value indicates the number of processors
+available per node.</li>
+<li><strong>verbosity</strong> (int): Indicates how much information should be printed to stdout.  The default level
+is zero. You may set this arbitrarily high.</li>
+</ul>
+</div>
+<div class="section" id="isotope-tracking">
+<span id="id1"></span><h2>Isotope Tracking<a class="headerlink" href="#isotope-tracking" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>core_load_isos</strong> (list or path):  This parameter specifies all of the isotopes that may
+be present in the initial core loading of the reactor.  As such, it is these isotopes that
+char worries about transmuting from.</li>
+<li><strong>core_transmute_isos</strong> (list or path):  This parameter gives all of the nulcides that char
+tracks throughout a burnup-depeletion calcultion.  As such, it is this set that determines
+which isotopes are transmuted to.  Cross sections are calculated for all isotopes in this
+list.</li>
+</ul>
+<p>There are a few ways to instantiate these two variables.
+The preffered way is to import some of the predefined lists that have already been specified
+in char.  This prevents the user from having to build undo specification:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Set isotopes to track</span>
+<span class="kn">from</span> <span class="nn">char.iso_track</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">transmute</span>
+<span class="n">core_load_isos</span>      <span class="o">=</span> <span class="n">load</span>
+<span class="n">core_transmute_isos</span> <span class="o">=</span> <span class="n">transmute</span>
+</pre></div>
+</div>
+<p>Valid lists that may be imported are <tt class="docutils literal"><span class="pre">load</span></tt>, <tt class="docutils literal"><span class="pre">transmute</span></tt>, <tt class="docutils literal"><span class="pre">actinides</span></tt>, <tt class="docutils literal"><span class="pre">uranium</span></tt>, and <tt class="docutils literal"><span class="pre">u235</span></tt>.
+The contents of these lists may be seen at
+<a class="reference external" href="https://github.com/scopatz/char/blob/master/char/iso_track.py">the github website</a>.</p>
+<p>Moreover, the user can simply pass in python lists:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Set isotopes to track</span>
+<span class="n">core_load_isos</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;U235&#39;</span><span class="p">,</span> <span class="mi">922380</span><span class="p">,</span> <span class="s">&#39;O16&#39;</span><span class="p">,</span> <span class="mi">10010</span><span class="p">]</span>
+<span class="n">core_transmute_isos</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Am245&#39;</span><span class="p">,</span> <span class="s">&#39;PU240&#39;</span><span class="p">,</span> <span class="s">&#39;tc99&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Additionally, suppose that you have file that is a whitespace separated list of isotope names.
+A string-valued path to this file may also be passed into these parameters.</p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">isos_to_track.txt</span></tt>:</p>
+<div class="highlight-python"><pre>U235
+Th232 80160
+AM242m</pre>
+</div>
+<p>Relevant part of <tt class="docutils literal"><span class="pre">defchar.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Set isotopes to track</span>
+<span class="n">core_load_isos</span> <span class="o">=</span> <span class="s">&quot;/path/to/isos_to_track.txt&quot;</span>
+<span class="n">core_transmute_isos</span> <span class="o">=</span> <span class="s">&quot;/path/to/isos_to_track.txt&quot;</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="calculation-mode-templates">
+<h2>Calculation Mode Templates<a class="headerlink" href="#calculation-mode-templates" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>xs_gen_template</strong> (str): An unformatted string template that is used for cross-section generation
+calculations.</li>
+<li><strong>burnup_template</strong> (str): An unformatted string template that is used for burnup-depletion
+calculations.</li>
+</ul>
+<p>Like in <a class="reference internal" href="#isotope-tracking"><em>Isotope Tracking</em></a>, the preffered method of supplying templates is from pre-defined
+versions in char itself.  Current values may be seen
+<a class="reference external" href="https://github.com/scopatz/char/blob/master/char/templates/lwr/serpent.py">at github</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Load stock template string from char</span>
+<span class="kn">from</span> <span class="nn">char.templates.lwr</span> <span class="kn">import</span> <span class="n">serpent</span>
+<span class="n">xs_gen_template</span> <span class="o">=</span> <span class="n">serpent</span><span class="o">.</span><span class="n">xs_gen</span>
+<span class="n">burnup_template</span> <span class="o">=</span> <span class="n">serpent</span><span class="o">.</span><span class="n">burnup</span>
+</pre></div>
+</div>
+<p>Of course, the user could generate their own template strings and place them here.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/CharIconSmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Char Configuration</a><ul>
+<li><a class="reference internal" href="#general-specification">General Specification</a></li>
+<li><a class="reference internal" href="#isotope-tracking">Isotope Tracking</a></li>
+<li><a class="reference internal" href="#calculation-mode-templates">Calculation Mode Templates</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="runtime.html"
+                        title="previous chapter">Runtime Options</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="contact.html"
+                        title="next chapter">Contact Info</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/configuration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="contact.html" title="Contact Info"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="runtime.html" title="Runtime Options"
+             >previous</a> |</li>
+        <li><a href="index.html">char v0.15 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Anthony Scopatz.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>

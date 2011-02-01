@@ -1,0 +1,286 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Runtime Options &mdash; char v0.15 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.15',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="char v0.15 documentation" href="index.html" />
+    <link rel="next" title="Char Configuration" href="configuration.html" />
+    <link rel="prev" title="Welcome to the Char documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="configuration.html" title="Char Configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to the Char documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">char v0.15 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="runtime-options">
+<h1>Runtime Options<a class="headerlink" href="#runtime-options" title="Permalink to this headline">¶</a></h1>
+<p>Char has a large number of runtime options that drive how it performs.  You can obtain the
+following information by using the <tt class="docutils literal"><span class="pre">--help</span></tt> option:</p>
+<div class="highlight-python"><pre>Usage: char [options] confchar
+
+Options:
+  -h, --help        show this help message and exit
+  -v, --verbose     Gives extra info while running.
+  -i, --input       Makes the transport calculation input deck.
+  -r, --run         Run the transport calculation.
+  -d, --dry-run     Dry Run. Do NOT run the transport calculation.
+  -a, --analyze     Run analysis on database.
+  -b, --burnup      Run the burnup calculation.
+  -x, --xs          Run the cross-section generation calculation.
+  -m, --delta-mass  Run the initial isotope sensitivity calculation.
+  -c, --clean       Cleans the reactor direactory of current files.
+  -l, --local       Run or Fetch files locally.
+  -s, --server      Run or Fetch files from a remote server.
+  -f, --fetch       Fetches files from the remote server. Does not run
+                    transport, even if -r is set. Automatically sets -s.
+  -p, --pid         Finds the process identification number of a current
+                    transport run. Sets -d.
+  -k, --kill        Kills the current transport run. Sets -p.
+  --cwd             Run char in the current working directory.
+  --ui              Launches the char ui.</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">confchar</span></tt> argument is a path to a python file, typically called <tt class="docutils literal"><span class="pre">defchar.py</span></tt> that is used to
+specify required parameters of char.  The reason that this appears as a runtime argument is because
+configuration files can be specified and stored up for different types of reactors, runs, or perturbations.</p>
+<div class="section" id="input-generation-i-input">
+<h2>Input Generation  (-i, &#8211;input)<a class="headerlink" href="#input-generation-i-input" title="Permalink to this headline">¶</a></h2>
+<p>This option generates all of the initial input files that are required to perform any transport run.
+It initializes the <tt class="docutils literal"><span class="pre">{reactor}.h5</span></tt> file, which is the cross-section database.</p>
+</div>
+<div class="section" id="execution-r-run-d-dry-run">
+<h2>Execution (-r, &#8211;run) (-d, &#8211;dry-run)<a class="headerlink" href="#execution-r-run-d-dry-run" title="Permalink to this headline">¶</a></h2>
+<p>The run command encapsulates all of the logic on where to execute char (locally or on a server) and
+aggregates all of the run modes (burnup, cross-section generation, and isotopic sensitivity study)
+together in a single run command.</p>
+<p>If the above run modes are give withough the <tt class="docutils literal"><span class="pre">-r</span></tt> option, the transport will be run within this process
+rather than being subprocessed out appropriately.</p>
+<p>On the other hand, the <tt class="docutils literal"><span class="pre">-d</span></tt>  command will set up all required files to run, but skip the actual execution.
+This is most useful in debugging.</p>
+</div>
+<div class="section" id="clean-c-clean">
+<h2>Clean (-c, &#8211;clean)<a class="headerlink" href="#clean-c-clean" title="Permalink to this headline">¶</a></h2>
+<p>Execution typically produces a large number of files.  These mostly come from serpent and other
+inputs that char uses and parses.  However, if you are worried about a previous run interfering
+with the state of a new run, the clean command will remove all previously generated files and ensure
+a fresh start.</p>
+</div>
+<div class="section" id="local-execution-l-local">
+<h2>Local Execution (-l, &#8211;local)<a class="headerlink" href="#local-execution-l-local" title="Permalink to this headline">¶</a></h2>
+<p>This command, along with <tt class="docutils literal"><span class="pre">-r</span></tt>, will run char and all of the serpent runs locally.</p>
+</div>
+<div class="section" id="remote-execution-s-server">
+<h2>Remote Execution (-s, &#8211;server)<a class="headerlink" href="#remote-execution-s-server" title="Permalink to this headline">¶</a></h2>
+<p>This command, along with <tt class="docutils literal"><span class="pre">-r</span></tt>, will run char and all of the serpent runs on a remote server machine.
+This server must have serpent and char and all of thier dependnecies installed as well.  The remote
+server information must be specified in the <tt class="docutils literal"><span class="pre">confchar</span></tt> file.</p>
+<p>This uses ssh and rsync on the backend, so an rsa key is highly recomended.</p>
+</div>
+<div class="section" id="remote-file-retrieval-f-fetch">
+<h2>Remote File Retrieval (-f, &#8211;fetch)<a class="headerlink" href="#remote-file-retrieval-f-fetch" title="Permalink to this headline">¶</a></h2>
+<p>Char provides an easy way to fetch the files that were generated on a remote server via the <tt class="docutils literal"><span class="pre">-f</span></tt> option.</p>
+</div>
+<div class="section" id="burnup-calculation-b-burnup">
+<h2>Burnup Calculation (-b, &#8211;burnup)<a class="headerlink" href="#burnup-calculation-b-burnup" title="Permalink to this headline">¶</a></h2>
+<p>This option runs char in a burnup mode which calculates and stores the isotopic vectors for every
+burnup step, for every perturbation.  This option is typically required before other kinds of
+calculation modes.</p>
+</div>
+<div class="section" id="neutron-cross-section-generation-x-xs">
+<h2>Neutron Cross Section Generation (-x, &#8211;xs)<a class="headerlink" href="#neutron-cross-section-generation-x-xs" title="Permalink to this headline">¶</a></h2>
+<p>The main purpose of char is to calculate neutron cross-sections for various reactor situations.
+This determines whether every isotope in the isotopic tracking list is available in serpent or not.
+If it is, then serpent is used to generate cross sections of the reaction types specified.
+If the isotope is not available in the serepent library, then the physical models are used along with a
+high-resolution flux (calculated by serpent) to generate the cross-sections.</p>
+<p>This run mode requires that the burnup calculation be run as well.</p>
+</div>
+<div class="section" id="isotopic-sensitivity-study-m-delta-mass">
+<h2>Isotopic Sensitivity Study (-m, &#8211;delta-mass)<a class="headerlink" href="#isotopic-sensitivity-study-m-delta-mass" title="Permalink to this headline">¶</a></h2>
+<p>Char allows for the inital isotopic vector to be perturbed on a per-isotope basis.
+However, in general, pertubing all isotopes in not desirable because most isotopes do
+not have a significant impact on the reactivity of the core.</p>
+<p>Still, for more complex reactors with a large number of input isotopics, determining which
+nuclides to perturb is not immeadiately appearent.  For exmaple, in an typical light water
+reactor, U-235 is the isotope to perturb.  However, in a given fast reactor setup the answer
+is less obvious.</p>
+<p>The <tt class="docutils literal"><span class="pre">-m</span></tt> option seeks to rectify this by performing a linear sensitivity study for all
+isotopes to the reactivity of the reactor for all perturbations.  Results are displayed
+as if the <tt class="docutils literal"><span class="pre">-a</span></tt> analysis option were used.</p>
+</div>
+<div class="section" id="analysis-a-analyze">
+<h2>Analysis (-a, &#8211;analyze)<a class="headerlink" href="#analysis-a-analyze" title="Permalink to this headline">¶</a></h2>
+<p>This mode performs analysis for a previosuly calculated database.</p>
+<p>Currently, only the isotopic sensitivity study has an associated analysis mode.  Here
+for each isotope and for each perturbation, the standard deviation of the reactivity
+is calculated for each burn step.  The maximum of standard deviation over all burn steps
+and perturbations is takes as the metric for each isotopes.  The isotopes are then sorted
+by this metric.  The higher the value the more likely this isotopes should be incuded as
+a perturbation parameter to the database.  The maximal standard deviation for each isotope
+is printed to stdout.</p>
+</div>
+<div class="section" id="process-discovery-and-timing-p-pid">
+<h2>Process Discovery and Timing (-p, &#8211;pid)<a class="headerlink" href="#process-discovery-and-timing-p-pid" title="Permalink to this headline">¶</a></h2>
+<p>This command find the process identity for a given run of char that has already been spwaned.
+This command may work in conjuction with <tt class="docutils literal"><span class="pre">-l</span></tt> and <tt class="docutils literal"><span class="pre">-s</span></tt> for local and remote discovery.</p>
+<p>Additionally, it prints out the time that the has been spent executing this command.</p>
+</div>
+<div class="section" id="process-termination-k-kill">
+<h2>Process Termination (-k, &#8211;kill)<a class="headerlink" href="#process-termination-k-kill" title="Permalink to this headline">¶</a></h2>
+<p>This command attempts to kill any currently executing char process.  It may be run
+in conjuction with <tt class="docutils literal"><span class="pre">-l</span></tt> and <tt class="docutils literal"><span class="pre">-s</span></tt> for local and remote termination.</p>
+</div>
+<div class="section" id="current-working-directory-cwd">
+<h2>Current Working Directory (&#8211;cwd)<a class="headerlink" href="#current-working-directory-cwd" title="Permalink to this headline">¶</a></h2>
+<p>This command executes char within the current working directory, rather than creating a folder
+with the same name as the reactor and execting there.  This option is primarily used in char&#8217;s
+internals, but may be useful for debugging.</p>
+</div>
+<div class="section" id="graphical-user-interface-ui">
+<h2>Graphical User Interface (&#8211;ui)<a class="headerlink" href="#graphical-user-interface-ui" title="Permalink to this headline">¶</a></h2>
+<p>Char comes packaged with a graphical user interface.  Currently, this is used to
+inspect the database library and plot certain types of regular data.</p>
+<p>The GUI is based of of the Enthought Tool Suite.  Here is a screenshot, because people love those.</p>
+<a class="reference internal image-reference" href="_images/char_ui_screenshot.png"><img alt="_images/char_ui_screenshot.png" class="align-center" src="_images/char_ui_screenshot.png" style="width: 840.0px; height: 525.0px;" /></a>
+</div>
+</div>
+<div class="section" id="common-workflows">
+<h1>Common Workflows<a class="headerlink" href="#common-workflows" title="Permalink to this headline">¶</a></h1>
+<p>Below are some comon workflows that are used in to run char in various modes.</p>
+<p>Initialize a reactor:</p>
+<div class="highlight-python"><pre>char -i -c defchar.py</pre>
+</div>
+<p>Run a burnup &amp; cross section calculation remotely:</p>
+<div class="highlight-python"><pre># Run the reactor
+char -irs -cbx defchar.py
+
+# Poll the remote server
+char -ps defchar.py
+
+# After the calculation is complete, get the files
+char -f defchar.py</pre>
+</div>
+<p>Run an isotopic sensitivity study and analyze the results:</p>
+<div class="highlight-python"><pre>char -irl -cm defchar.py
+char -a defchar.py</pre>
+</div>
+<p>Start the user interface:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">char</span> <span class="o">--</span><span class="n">ui</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/CharIconSmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Runtime Options</a><ul>
+<li><a class="reference internal" href="#input-generation-i-input">Input Generation  (-i, &#8211;input)</a></li>
+<li><a class="reference internal" href="#execution-r-run-d-dry-run">Execution (-r, &#8211;run) (-d, &#8211;dry-run)</a></li>
+<li><a class="reference internal" href="#clean-c-clean">Clean (-c, &#8211;clean)</a></li>
+<li><a class="reference internal" href="#local-execution-l-local">Local Execution (-l, &#8211;local)</a></li>
+<li><a class="reference internal" href="#remote-execution-s-server">Remote Execution (-s, &#8211;server)</a></li>
+<li><a class="reference internal" href="#remote-file-retrieval-f-fetch">Remote File Retrieval (-f, &#8211;fetch)</a></li>
+<li><a class="reference internal" href="#burnup-calculation-b-burnup">Burnup Calculation (-b, &#8211;burnup)</a></li>
+<li><a class="reference internal" href="#neutron-cross-section-generation-x-xs">Neutron Cross Section Generation (-x, &#8211;xs)</a></li>
+<li><a class="reference internal" href="#isotopic-sensitivity-study-m-delta-mass">Isotopic Sensitivity Study (-m, &#8211;delta-mass)</a></li>
+<li><a class="reference internal" href="#analysis-a-analyze">Analysis (-a, &#8211;analyze)</a></li>
+<li><a class="reference internal" href="#process-discovery-and-timing-p-pid">Process Discovery and Timing (-p, &#8211;pid)</a></li>
+<li><a class="reference internal" href="#process-termination-k-kill">Process Termination (-k, &#8211;kill)</a></li>
+<li><a class="reference internal" href="#current-working-directory-cwd">Current Working Directory (&#8211;cwd)</a></li>
+<li><a class="reference internal" href="#graphical-user-interface-ui">Graphical User Interface (&#8211;ui)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-workflows">Common Workflows</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to the Char documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="next chapter">Char Configuration</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/runtime.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="configuration.html" title="Char Configuration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to the Char documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">char v0.15 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Anthony Scopatz.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>
