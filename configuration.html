@@ -61,13 +61,22 @@ directly into <tt class="docutils literal"><span class="pre">defchar.py</span></
 not provided.</p>
 <p>What follows is an explanation of all of the input paramters that may be specified in a <tt class="docutils literal"><span class="pre">defchar.py</span></tt>
 file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Any parameter whose type informatation includes the optional <tt class="docutils literal"><span class="pre">[sequence</span> <span class="pre">of]</span></tt> flag may be
+confugured using a scalar value of this type or by a list or tuple, whose elements are all
+of this same type.</p>
+<p class="last">Parameters flagged in this way are included in the perturbation table.  The perturbation table
+itself is calculated at the outproduct of all of these parameters.  This is the fundemental
+method by which char calculates different cross section sets in the same library.</p>
+</div>
 <div class="section" id="general-specification">
 <h2>General Specification<a class="headerlink" href="#general-specification" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><strong>reactor</strong> (str): A string name for the reactor.  This is used as an identified throughout
 much of char.  Only letters and underscores are valid characters.  Exmples include
 <tt class="docutils literal"><span class="pre">&quot;lwr&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;fast_reactor&quot;</span></tt>, and <tt class="docutils literal"><span class="pre">&quot;LWR_more_perts&quot;</span></tt>.</li>
-<li><strong>burn_regions</strong> (int): This specifies the number of annular burn regions in a fuel pin.
+<li><strong>burn_regions</strong> ([sequence of] int): This specifies the number of annular burn regions in a fuel pin.
 The absolut minimum number is 1, however three to four are probably required for decent statistics.
 The serpent manual recomends ten.</li>
 <li><strong>burn_time</strong> (int or float): This is the total time, in days, that all burnup calculations should
@@ -76,7 +85,7 @@ be run for. As such, it is a surrogate for the fluence.  For a light water react
 <li><strong>time_step</strong> (int or float): Time step by which to increment <tt class="docutils literal"><span class="pre">burn_time</span></tt>.  The code generally
 works best when <tt class="docutils literal"><span class="pre">(0</span> <span class="pre">==</span> <span class="pre">burn_time</span> <span class="pre">%</span> <span class="pre">time_step)</span></tt>.  It is usually better to guess smaller values
 for this parameter rather than larger ones.</li>
-<li><strong>email</strong> (str): An email address to send runtime updates to, &#8220;<a class="reference external" href="mailto:char&#37;&#52;&#48;zeon&#46;com">char<span>&#64;</span>zeon<span>&#46;</span>com</a>&#8221;.</li>
+<li><strong>email</strong> (str): An email address to send runtime updates to, &#8220;<a class="reference external" href="mailto:char&#37;&#52;&#48;zeon&#46;gov">char<span>&#64;</span>zeon<span>&#46;</span>gov</a>&#8221;.</li>
 <li><strong>scheduler</strong> (str): If present, this value specifices which scheduler to use.  Accepted values include
 an empty string <tt class="docutils literal"><span class="pre">''</span></tt> to indicate no scheduler and <tt class="docutils literal"><span class="pre">&quot;PBS&quot;</span></tt> to use the torque scheduler.</li>
 <li><strong>number_cpus</strong> (int): This is the number of CPUs to run the transport code on if parallel processing
@@ -86,6 +95,21 @@ available per node.</li>
 <li><strong>verbosity</strong> (int): Indicates how much information should be printed to stdout.  The default level
 is zero. You may set this arbitrarily high.</li>
 </ul>
+<p>For example, one may set up the general portion as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">reactor</span> <span class="o">=</span> <span class="s">&quot;lwr&quot;</span>         <span class="c"># Run identifier</span>
+<span class="n">burn_regions</span> <span class="o">=</span> <span class="mi">1</span>        <span class="c"># Number of burnup annular regions.</span>
+<span class="n">burn_time</span> <span class="o">=</span> <span class="mi">4200</span>        <span class="c"># Number of days to burn the material [days]</span>
+<span class="n">time_step</span> <span class="o">=</span> <span class="mi">840</span>         <span class="c"># Time step by which to increment the burn [days]</span>
+<span class="n">email</span> <span class="o">=</span> <span class="s">&quot;char@zeon.gov&quot;</span> <span class="c"># E-mail address to send job information to.</span>
+<span class="n">verbosity</span> <span class="o">=</span> <span class="mi">100</span>         <span class="c"># Print absolutely everything</span>
+
+<span class="c"># A commented out line</span>
+<span class="c">#scheduler = &quot;PBS&quot;</span>
+
+<span class="n">number_cpus</span>   <span class="o">=</span> <span class="mi">3</span>   <span class="c"># Number of CPUs to run transport code on.</span>
+<span class="n">cpus_per_node</span> <span class="o">=</span> <span class="mi">4</span>   <span class="c"># Processors per node</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="isotope-tracking">
 <span id="id1"></span><h2>Isotope Tracking<a class="headerlink" href="#isotope-tracking" title="Permalink to this headline">¶</a></h2>
@@ -133,11 +157,11 @@ AM242m</pre>
 </blockquote>
 </div>
 <div class="section" id="calculation-mode-templates">
-<h2>Calculation Mode Templates<a class="headerlink" href="#calculation-mode-templates" title="Permalink to this headline">¶</a></h2>
+<span id="calc-mode-templates"></span><h2>Calculation Mode Templates<a class="headerlink" href="#calculation-mode-templates" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>xs_gen_template</strong> (str): An unformatted string template that is used for cross-section generation
-calculations.</li>
 <li><strong>burnup_template</strong> (str): An unformatted string template that is used for burnup-depletion
+calculations.</li>
+<li><strong>xs_gen_template</strong> (str): An unformatted string template that is used for cross-section generation
 calculations.</li>
 </ul>
 <p>Like in <a class="reference internal" href="#isotope-tracking"><em>Isotope Tracking</em></a>, the preffered method of supplying templates is from pre-defined
@@ -145,11 +169,468 @@ versions in char itself.  Current values may be seen
 <a class="reference external" href="https://github.com/scopatz/char/blob/master/char/templates/lwr/serpent.py">at github</a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Load stock template string from char</span>
 <span class="kn">from</span> <span class="nn">char.templates.lwr</span> <span class="kn">import</span> <span class="n">serpent</span>
-<span class="n">xs_gen_template</span> <span class="o">=</span> <span class="n">serpent</span><span class="o">.</span><span class="n">xs_gen</span>
 <span class="n">burnup_template</span> <span class="o">=</span> <span class="n">serpent</span><span class="o">.</span><span class="n">burnup</span>
+<span class="n">xs_gen_template</span> <span class="o">=</span> <span class="n">serpent</span><span class="o">.</span><span class="n">xs_gen</span>
 </pre></div>
 </div>
-<p>Of course, the user could generate their own template strings and place them here.</p>
+<p>Of course, the user could generate their own template strings and place them here.
+If one wehere to do this, the avaiable fill variables are listed below.  All of the
+values of these variables are strings, or like integers or floats, easily coerced
+to strings.  For more information please refer to the
+<a class="reference external" href="http://docs.python.org/library/string.html#format-specification-mini-language">Python manual</a>.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Burnup</strong>:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">reactor</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xsdata</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">decay_lib</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fission_yield_lib</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel_radius</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel_density</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel_specific_power</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">num_burn_regions</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cladding</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">clad_radius</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">clad_density</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">coolant</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cool_radius</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cool_density</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sym_flag</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">n_groups</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">group_lower_bound</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">group_upper_bound</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">group_inner_structure</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">k_cycles</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">k_cycles_skip</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">k_particles</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">lattice</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">lattice_xy</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cell_pitch</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">half_lattice_pitch</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">depletion_times</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">transmute_inventory</span></tt></li>
+</ul>
+</dd>
+<dt><strong>Cross Section Generation</strong>:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">reactor</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xsdata</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel_radius</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel_density</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fuel_specific_power</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">num_burn_regions</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cladding</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">clad_radius</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">clad_density</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">coolant</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cool_radius</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cool_density</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sym_flag</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">n_groups</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">group_structure</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">group_lower_bound</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">group_upper_bound</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">group_inner_structure</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">k_cycles</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">k_cycles_skip</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">k_particles</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">lattice</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">lattice_xy</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cell_pitch</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">half_lattice_pitch</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xsiso</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xsdet</span></tt></li>
+</ul>
+</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="unit-cell-sepcifications">
+<h2>Unit Cell Sepcifications<a class="headerlink" href="#unit-cell-sepcifications" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>fuel_cell_radius</strong> ([sequence of] float): Fuel cell radius [cm].</li>
+<li><strong>void_cell_radius</strong> ([sequence of] float): Void cell radius [cm].  Must be greater than or
+equal to the <tt class="docutils literal"><span class="pre">fuel_cell_radius</span></tt>.</li>
+<li><strong>clad_cell_radius</strong> ([sequence of] float): Cladding cell radius [cm].  Must be greater than or
+equal to the <tt class="docutils literal"><span class="pre">void_cell_radius</span></tt>.</li>
+<li><strong>unit_cell_pitch</strong> ([sequence of] float): The length of the unit cell box [cm].</li>
+<li><strong>unit_cell_height</strong> ([sequence of] float): The length of the z-direction of the lattice of
+interest [cm].</li>
+<li><strong>fuel_density</strong> ([sequence of] float): Denisty of fuel region [g/cm^3].</li>
+<li><strong>clad_density</strong> ([sequence of] float): Denisty of cladding region [g/cm^3].</li>
+<li><strong>cool_density</strong> ([sequence of] float): Denisty of coolant region [g/cm^3].</li>
+<li><strong>fuel_specific_power</strong> ([sequence of] float): Mass-normalized power from a unit of fuel [W/g].
+Required for burnup and sensitivity calculations.</li>
+</ul>
+<p>An example that is representative of a light water reactor is as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fuel_cell_radius</span> <span class="o">=</span> <span class="mf">0.410</span>
+<span class="n">void_cell_radius</span> <span class="o">=</span> <span class="mf">0.4185</span>
+<span class="n">clad_cell_radius</span> <span class="o">=</span> <span class="mf">0.475</span>
+<span class="n">unit_cell_pitch</span>  <span class="o">=</span> <span class="mf">0.65635</span> <span class="o">*</span> <span class="mf">2.0</span>
+<span class="n">unit_cell_height</span> <span class="o">=</span> <span class="mf">10.0</span>
+
+<span class="n">fuel_density</span> <span class="o">=</span> <span class="p">[</span><span class="mf">10.7</span><span class="p">,</span> <span class="mf">10.7</span><span class="o">*</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">10.7</span><span class="o">*</span><span class="mf">1.1</span><span class="p">]</span>   <span class="c"># Run 3 different fuel densities</span>
+<span class="n">clad_density</span> <span class="o">=</span> <span class="mf">5.87</span>
+<span class="n">cool_density</span> <span class="o">=</span> <span class="mf">0.73</span>
+
+<span class="n">fuel_specific_power</span> <span class="o">=</span> <span class="mf">40.0</span> <span class="o">/</span> <span class="mf">1000.0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="lattice-specification">
+<h2>Lattice Specification<a class="headerlink" href="#lattice-specification" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>lattice</strong> (str):  This is a string that represents the lattice that is used by serpent.
+While interally char does some analysis of this string (to set the symmetric lattice flag <tt class="docutils literal"><span class="pre">sym_flag</span></tt>),
+this string is passed directly into serpent.  When using the
+<a class="reference internal" href="#calc-mode-templates"><em>default serpent templates</em></a>, the number <tt class="docutils literal"><span class="pre">1</span></tt> represents a fuel pin,
+while the number <tt class="docutils literal"><span class="pre">2</span></tt> represents a coolant pin.  These are material numbers defined in the templates.
+New rows must be separated by newline characters.
+Optional, if not provided, a 17x17 pressurized water reactor assembly is subsitutied.</li>
+<li><strong>lattice_xy</strong> (int):  The number of rows and columns in a fuel assembly.
+For instance, this number would be 17 for a 17x17 assembly or 9 for 9x9 assembly.
+Optional, if not provided, this value is given as 17 to match <tt class="docutils literal"><span class="pre">lattice</span></tt>.</li>
+</ul>
+<p>More information on how to set up lattices is available in the serpent manual.
+The default values are as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">lattice_xy</span> <span class="o">=</span> <span class="mi">17</span>
+<span class="n">lattice</span>    <span class="o">=</span> <span class="p">(</span><span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 2 1 1 2 1 1 2 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 2 1 1 1 1 1 1 1 1 1 2 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 2 1 1 2 1 1 2 1 1 2 1 1 2 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 2 1 1 2 1 1 2 1 1 2 1 1 2 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 2 1 1 2 1 1 2 1 1 2 1 1 2 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 2 1 1 1 1 1 1 1 1 1 2 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 2 1 1 2 1 1 2 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="s">&quot;1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mass-stream-information">
+<h2>Mass Stream Information<a class="headerlink" href="#mass-stream-information" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>initial_heavy_metal</strong> (dict): A ditionary that specifies the initial heavy metal
+concentrations of each isotope in a pure fuel stream.  The keys of this isotope are
+integers in <tt class="docutils literal"><span class="pre">zzaaam</span></tt>-form.  The values are floats on the range <tt class="docutils literal"><span class="pre">[0,</span> <span class="pre">1]</span></tt>.
+The sum of all values here should equal 1.  Therefore, this represents 1 [kgIHM].</li>
+<li><strong>fuel_chemical_form</strong> (dict): This is another python dictionary that gives the
+chemical composition of the fuel region.  Keys are either isotopes in <tt class="docutils literal"><span class="pre">zzaaam</span></tt>-form
+or the string <tt class="docutils literal"><span class="pre">&quot;IHM&quot;</span></tt>, which is a placeholder for the <tt class="docutils literal"><span class="pre">initial_heavy_metal</span></tt> stream.
+Values are floats that repesent the number of atoms in this chemical form.</li>
+<li><strong>clad_form</strong> (dict): A python dictionary that represents the cladding material. The keys of
+this isotope are integers in <tt class="docutils literal"><span class="pre">zzaaam</span></tt>-form.  The values are floats on the range <tt class="docutils literal"><span class="pre">[0,</span> <span class="pre">1]</span></tt>.
+The sum of all values here should equal 1.
+Optional, if not present in <tt class="docutils literal"><span class="pre">defchar.py</span></tt> a default zircaloy will be substituted.</li>
+<li><strong>cool_form</strong> (dict): A python dictionary that represents the cladding material. The keys of
+this isotope are integers in <tt class="docutils literal"><span class="pre">zzaaam</span></tt>-form.  The values are floats on the range <tt class="docutils literal"><span class="pre">[0,</span> <span class="pre">1]</span></tt>.
+The sum of all values here should equal 1.
+Optional, if not present in <tt class="docutils literal"><span class="pre">defchar.py</span></tt> borated light water will be substituted.</li>
+</ul>
+<p>The following values represent a light water reactor:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Low enriched uranium</span>
+<span class="n">initial_heavy_metal</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">922350</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span>
+    <span class="mi">922380</span><span class="p">:</span> <span class="mf">0.96</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="c"># Uranium oxide</span>
+<span class="n">fuel_chemical_form</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">80160</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="s">&quot;IHM&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="c"># Default zircaloy</span>
+<span class="n">clad_form</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c"># Natural Zirconium</span>
+    <span class="mi">400900</span><span class="p">:</span> <span class="mf">0.98135</span> <span class="o">*</span> <span class="mf">0.5145</span><span class="p">,</span>
+    <span class="mi">400910</span><span class="p">:</span> <span class="mf">0.98135</span> <span class="o">*</span> <span class="mf">0.1122</span><span class="p">,</span>
+    <span class="mi">400920</span><span class="p">:</span> <span class="mf">0.98135</span> <span class="o">*</span> <span class="mf">0.1715</span><span class="p">,</span>
+    <span class="mi">400940</span><span class="p">:</span> <span class="mf">0.98135</span> <span class="o">*</span> <span class="mf">0.1738</span><span class="p">,</span>
+    <span class="mi">400960</span><span class="p">:</span> <span class="mf">0.98135</span> <span class="o">*</span> <span class="mf">0.0280</span><span class="p">,</span>
+    <span class="c"># The plastic is all melted and the natural Chromium too..</span>
+    <span class="mi">240500</span><span class="p">:</span> <span class="mf">0.00100</span> <span class="o">*</span> <span class="mf">0.04345</span><span class="p">,</span>
+    <span class="mi">240520</span><span class="p">:</span> <span class="mf">0.00100</span> <span class="o">*</span> <span class="mf">0.83789</span><span class="p">,</span>
+    <span class="mi">240530</span><span class="p">:</span> <span class="mf">0.00100</span> <span class="o">*</span> <span class="mf">0.09501</span><span class="p">,</span>
+    <span class="mi">240540</span><span class="p">:</span> <span class="mf">0.00100</span> <span class="o">*</span> <span class="mf">0.02365</span><span class="p">,</span>
+    <span class="c"># Natural Iron</span>
+    <span class="mi">260540</span><span class="p">:</span> <span class="mf">0.00135</span> <span class="o">*</span> <span class="mf">0.05845</span><span class="p">,</span>
+    <span class="mi">260560</span><span class="p">:</span> <span class="mf">0.00135</span> <span class="o">*</span> <span class="mf">0.91754</span><span class="p">,</span>
+    <span class="mi">260570</span><span class="p">:</span> <span class="mf">0.00135</span> <span class="o">*</span> <span class="mf">0.02119</span><span class="p">,</span>
+    <span class="mi">260580</span><span class="p">:</span> <span class="mf">0.00135</span> <span class="o">*</span> <span class="mf">0.00282</span><span class="p">,</span>
+    <span class="c"># Natural Nickel</span>
+    <span class="mi">280580</span><span class="p">:</span> <span class="mf">0.00055</span> <span class="o">*</span> <span class="mf">0.68077</span><span class="p">,</span>
+    <span class="mi">280600</span><span class="p">:</span> <span class="mf">0.00055</span> <span class="o">*</span> <span class="mf">0.26223</span><span class="p">,</span>
+    <span class="mi">280610</span><span class="p">:</span> <span class="mf">0.00055</span> <span class="o">*</span> <span class="mf">0.01140</span><span class="p">,</span>
+    <span class="mi">280620</span><span class="p">:</span> <span class="mf">0.00055</span> <span class="o">*</span> <span class="mf">0.03634</span><span class="p">,</span>
+    <span class="mi">280640</span><span class="p">:</span> <span class="mf">0.00055</span> <span class="o">*</span> <span class="mf">0.00926</span><span class="p">,</span>
+    <span class="c"># Natural Tin</span>
+    <span class="mi">501120</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.0097</span><span class="p">,</span>
+    <span class="mi">501140</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.0065</span><span class="p">,</span>
+    <span class="mi">501150</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.0034</span><span class="p">,</span>
+    <span class="mi">501160</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.1454</span><span class="p">,</span>
+    <span class="mi">501170</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.0768</span><span class="p">,</span>
+    <span class="mi">501180</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.2422</span><span class="p">,</span>
+    <span class="mi">501190</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.0858</span><span class="p">,</span>
+    <span class="mi">501200</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.3259</span><span class="p">,</span>
+    <span class="mi">501220</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.0463</span><span class="p">,</span>
+    <span class="mi">501240</span><span class="p">:</span> <span class="mf">0.01450</span> <span class="o">*</span> <span class="mf">0.0579</span><span class="p">,</span>
+    <span class="c"># We Need Oxygen!</span>
+    <span class="mi">80160</span><span class="p">:</span>  <span class="mf">0.00125</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="c"># Default borated light water</span>
+<span class="n">MW</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="mf">16.0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.199</span> <span class="o">*</span> <span class="mi">550</span> <span class="o">*</span> <span class="mf">10.0</span><span class="o">**-</span><span class="mi">6</span> <span class="o">*</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.801</span> <span class="o">*</span> <span class="mi">550</span> <span class="o">*</span> <span class="mf">10.0</span><span class="o">**-</span><span class="mi">6</span> <span class="o">*</span> <span class="mf">11.0</span><span class="p">)</span>
+<span class="n">cool_form</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">10010</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">MW</span><span class="p">,</span>
+    <span class="mi">80160</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="mf">16.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">MW</span><span class="p">,</span>
+    <span class="mi">50100</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.199</span> <span class="o">*</span> <span class="mi">550</span> <span class="o">*</span> <span class="mf">10.0</span><span class="o">**-</span><span class="mi">6</span> <span class="o">*</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">MW</span><span class="p">,</span>
+    <span class="mi">50110</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.801</span> <span class="o">*</span> <span class="mi">550</span> <span class="o">*</span> <span class="mf">10.0</span><span class="o">**-</span><span class="mi">6</span> <span class="o">*</span> <span class="mf">11.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">MW</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>Additionally, if for some reason the user does not wish to supply a mass-weighted fuel stream
+and instead spcifies atom fractions, the following parameters may be set away from their default
+<tt class="xref docutils literal"><span class="pre">True</span></tt> value.  If any of these are <tt class="xref docutils literal"><span class="pre">False</span></tt>, atom fractions wil be used.  This is not
+recomended in general.</p>
+<ul class="simple">
+<li><strong>fuel_form_mass_weighted</strong> (bool): Fuel stream mass-weighted / atom-fraction flag.</li>
+<li><strong>clad_form_mass_weighted</strong> (bool): Cladding stream mass-weighted / atom-fraction flag.</li>
+<li><strong>cool_form_mass_weighted</strong> (bool): Coolant stream mass-weighted / atom-fraction flag.</li>
+</ul>
+</div>
+<div class="section" id="initial-isotopic-perturbations">
+<h2>Initial Isotopic Perturbations<a class="headerlink" href="#initial-isotopic-perturbations" title="Permalink to this headline">¶</a></h2>
+<p>There are two main (optional) ways to pertub isotopes.  The first is such that a pertubed isotopic
+vector shows up in the outer product perturbation set.</p>
+<ul class="simple">
+<li><strong>initial_{iso}</strong> ([sequence of] float):  The mass fraction value(s) of this isotope that
+should be replaced in the <tt class="docutils literal"><span class="pre">initial_heavy_metal</span></tt> stream.  The <tt class="docutils literal"><span class="pre">{iso}</span></tt> term specifices
+the name of the isotope to be pertubed in <tt class="docutils literal"><span class="pre">LLAAAM</span></tt>-form.</li>
+</ul>
+<p>For example, take the following hypothetical mass stream:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Initial heavy metal mass fraction distribution</span>
+<span class="n">initial_heavy_metal</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">922340</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="mi">922350</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span>
+    <span class="mi">922380</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="c"># Pertub some of these nuclides</span>
+<span class="n">initial_U234</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">]</span>
+<span class="n">initial_U235</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The above would produce 6 initial heavy metal streams, one for each (U234, U235) combination, and
+generate burnups or cross sections for each of these mass streams.  The remaining isotopes (U238 here)
+would have their mass fractions altered to accomdated the perturbed mass stream.</p>
+<p>The second way that initial isotopes are perturbed is during the isotopic ssensitivity study (<tt class="docutils literal"><span class="pre">-m</span></tt>,
+calculation).  Every nuclide present in the <tt class="docutils literal"><span class="pre">initial_heavy_metal</span></tt> stream is pertubed by a set
+amounts.  These relative amounts are given via the following parameter.</p>
+<ul class="simple">
+<li><strong>sensitivity_mass_fractions</strong> ([sequence of] float): The relative amount by which to perturb each
+isotope in an isotopic sensitivity study, <tt class="docutils literal"><span class="pre">-m</span></tt>.</li>
+</ul>
+<p>An example that will perturb each isotopes initial amount by +/-10% from the initial value for every
+other pertubation is as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sensitivity_mass_fractions</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="crtiticality-control">
+<h2>Crtiticality Control<a class="headerlink" href="#crtiticality-control" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>k_cycles</strong> (int): The total number of criticality cycles to run.</li>
+<li><strong>k_cycles_skip</strong> (int): The number of cycles to run but not tally at the begining.
+This number must be strictly less than <tt class="docutils literal"><span class="pre">k_cycles</span></tt>.</li>
+<li><strong>k_particles</strong> (int): The number of source particles to run per cycle.</li>
+</ul>
+<p>These are some decent values for the criticality calculation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">k_particles</span>   <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">k_cycles</span>      <span class="o">=</span> <span class="mi">130</span>
+<span class="n">k_cycles_skip</span> <span class="o">=</span> <span class="mi">30</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-physical-parameters">
+<h2>Other Physical Parameters<a class="headerlink" href="#other-physical-parameters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>group_structure</strong> (sequence of floats): Defines the energy group structure but setting bounds
+on each group.  Energies are given in [MeV].  For <tt class="docutils literal"><span class="pre">G</span></tt> energy groups, this list must be of length
+<tt class="docutils literal"><span class="pre">G+1</span></tt>.  Note that this list is not allowed to change.</li>
+<li><strong>temperature</strong> (int or float): This is the value of the temperature [K] of the fuel region.  This
+parameter determines which cross-section set to use and is therefor not a continuous variable.
+Though char does not check, <tt class="docutils literal"><span class="pre">temperature</span></tt> should be a positive multiple of 300 K (ie 300, 600, 900, etc).
+If a value other than this is supplied, char will likely run, but use physical models everywhere instead
+of serpent generated values.</li>
+</ul>
+<p>Examples of the above parameters are as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># A log-spaced 10-group structure</span>
+<span class="n">group_structure</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0E-09</span><span class="p">,</span> <span class="mf">1.0E-08</span><span class="p">,</span> <span class="mf">1.0E-07</span><span class="p">,</span> <span class="mf">1.0E-06</span><span class="p">,</span> <span class="mf">1.0E-05</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
+
+<span class="c"># Temperature at 600 K</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="mi">600</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="remote-server-specification">
+<h2>Remote Server Specification<a class="headerlink" href="#remote-server-specification" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>remote_url</strong> (str): Remote server web- or ip-address. Optional.</li>
+<li><strong>remote_user</strong> (str): Login name to the remote server. Optional.</li>
+<li><strong>remote_dir</strong> (str): Directory on remote filesystem to store char files. Optional.</li>
+<li><strong>remote_gateway</strong> (str): Local hostname of the remote machine that the user logs in to. Optional.
+This is especially useful when running char on a remote cluster where the gateway machine
+might not have the same name locally that it provides to the outside world. Optional.</li>
+</ul>
+<p>Here is a Mr. Aznable might set up his remote configuration:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">remote_url</span>  <span class="o">=</span> <span class="s">&quot;mycluster.zeon.gov&quot;</span>
+<span class="n">remote_user</span> <span class="o">=</span> <span class="s">&quot;char&quot;</span>
+<span class="n">remote_dir</span>  <span class="o">=</span> <span class="s">&quot;/home/char/&quot;</span>
+<span class="n">remote_gateway</span> <span class="o">=</span> <span class="s">&#39;mycluster01&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="serpent-data-library-path-specification">
+<h2>Serpent Data Library Path Specification<a class="headerlink" href="#serpent-data-library-path-specification" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>serpent_xsdata</strong> (str):  Path to the serpent cross section library to use.</li>
+<li><strong>serpent_decay_lib</strong> (str): Path to the serpent decay library to use.  Optional, only
+required for burnup calculations.</li>
+<li><strong>serpent_fission_yield_lib</strong> (str): Path to the serpent fission yeild library to use.  Optional, only
+required for burnup calculations.</li>
+</ul>
+<p>Mr. Aznable&#8217;s friend, Casval, might want to use a common set of libraries. These parameters are therefore
+set as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Use ENDF libraries.</span>
+<span class="n">serpent_xsdata</span> <span class="o">=</span> <span class="s">&quot;/usr/share/serpent/xsdata/endf7.xsdata&quot;</span>
+
+<span class="c"># The following two are only needed for burnup runs</span>
+<span class="n">serpent_decay_lib</span> <span class="o">=</span> <span class="s">&quot;/usr/share/serpent/xsdata/sss_endfb7.dec&quot;</span>
+<span class="n">serpent_fission_yield_lib</span> <span class="o">=</span> <span class="s">&quot;/usr/share/serpent/xsdata/sss_endfb7.nfy&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="bringing-it-all-together">
+<h1>Bringing it all together<a class="headerlink" href="#bringing-it-all-together" title="Permalink to this headline">¶</a></h1>
+<p>Using the above specification information, a typical <tt class="docutils literal"><span class="pre">defchar.py</span></tt> might look like the
+following.  This configuration can be veiwed a a work in progress, since the user has
+chosen to comment some values out, but still wants to keep them around:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#############################</span>
+<span class="c">### General specifcations ###</span>
+<span class="c">#############################</span>
+<span class="n">reactor</span> <span class="o">=</span> <span class="s">&quot;lwr&quot;</span>
+<span class="n">burn_regions</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">burn_time</span>   <span class="o">=</span> <span class="mi">4200</span>
+<span class="c">#time_step = 840</span>
+<span class="n">email</span>      <span class="o">=</span> <span class="s">&quot;char@zeon.gov&quot;</span>
+
+<span class="c">#scheduler = &quot;PBS&quot;</span>
+
+<span class="n">number_cpus</span>   <span class="o">=</span> <span class="mi">3</span>   <span class="c"># Number of CPUs to run transport code on.</span>
+<span class="n">cpus_per_node</span> <span class="o">=</span> <span class="mi">4</span>   <span class="c"># Processors per node</span>
+
+<span class="n">verbosity</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c"># Set isotopes to track</span>
+<span class="kn">from</span> <span class="nn">char.iso_track</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">transmute</span>
+<span class="n">core_load_isos</span>      <span class="o">=</span> <span class="n">load</span>
+<span class="n">core_transmute_isos</span> <span class="o">=</span> <span class="n">transmute</span>
+
+
+<span class="c"># Load stock template string from char</span>
+<span class="c"># Having this allows users to specify other templates</span>
+<span class="kn">from</span> <span class="nn">char.templates.lwr</span> <span class="kn">import</span> <span class="n">serpent</span>
+<span class="n">xs_gen_template</span> <span class="o">=</span> <span class="n">serpent</span><span class="o">.</span><span class="n">xs_gen</span>
+<span class="n">burnup_template</span> <span class="o">=</span> <span class="n">serpent</span><span class="o">.</span><span class="n">burnup</span>
+
+
+<span class="c">################################</span>
+<span class="c">### Unit Cell Sepcifications ###</span>
+<span class="c">################################</span>
+<span class="n">fuel_cell_radius</span> <span class="o">=</span> <span class="mf">0.410</span>
+<span class="n">void_cell_radius</span> <span class="o">=</span> <span class="mf">0.4185</span>
+<span class="n">clad_cell_radius</span> <span class="o">=</span> <span class="mf">0.475</span>
+<span class="n">unit_cell_pitch</span>  <span class="o">=</span> <span class="mf">0.65635</span> <span class="o">*</span> <span class="mf">2.0</span>
+<span class="n">unit_cell_height</span> <span class="o">=</span> <span class="mf">10.0</span>
+
+<span class="n">fuel_density</span> <span class="o">=</span> <span class="p">[</span><span class="mf">10.7</span><span class="p">,</span> <span class="mf">10.7</span><span class="o">*</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">10.7</span><span class="o">*</span><span class="mf">1.1</span><span class="p">]</span>   <span class="c"># Denisty of Fuel</span>
+<span class="n">clad_density</span> <span class="o">=</span> <span class="mf">5.87</span>                         <span class="c"># Cladding Density</span>
+<span class="n">cool_density</span> <span class="o">=</span> <span class="mf">0.73</span>                         <span class="c"># Coolant Density</span>
+
+<span class="n">fuel_specific_power</span> <span class="o">=</span> <span class="mf">40.0</span> <span class="o">/</span> <span class="mf">1000.0</span>   <span class="c"># Power garnered from fuel [W / g]</span>
+
+
+<span class="c">#################################</span>
+<span class="c">### Mass Stream Specification ###</span>
+<span class="c">#################################</span>
+<span class="c"># LEU</span>
+<span class="n">initial_heavy_metal</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">922350</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span>
+    <span class="mi">922380</span><span class="p">:</span> <span class="mf">0.96</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="n">initial_U235</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">]</span>
+
+<span class="c"># UOX</span>
+<span class="n">fuel_chemical_form</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">80160</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="s">&quot;IHM&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="n">fuel_form_mass_weighted</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+<span class="c">###############################</span>
+<span class="c">### Criticality Information ###</span>
+<span class="c">###############################</span>
+<span class="c">#k_particles  = 500</span>
+<span class="c">#k_particles  = 5000</span>
+<span class="n">k_particles</span>  <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">k_cycles</span>      <span class="o">=</span> <span class="mi">130</span>
+<span class="n">k_cycles_skip</span> <span class="o">=</span> <span class="mi">30</span>
+
+
+<span class="c"># A log-spaced 10-group structure</span>
+<span class="n">group_structure</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0E-09</span><span class="p">,</span> <span class="mf">1.0E-08</span><span class="p">,</span> <span class="mf">1.0E-07</span><span class="p">,</span> <span class="mf">1.0E-06</span><span class="p">,</span> <span class="mf">1.0E-05</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
+
+<span class="c"># Temperature at 600 K</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="mi">600</span>
+
+
+<span class="c">###################################</span>
+<span class="c">### Remote Server Specification ###</span>
+<span class="c">###################################</span>
+<span class="n">remote_url</span>  <span class="o">=</span> <span class="s">&quot;mycluster.zeon.gov&quot;</span>
+<span class="n">remote_user</span> <span class="o">=</span> <span class="s">&quot;char&quot;</span>
+<span class="n">remote_dir</span>  <span class="o">=</span> <span class="s">&quot;/home/char/&quot;</span>
+<span class="n">remote_gateway</span> <span class="o">=</span> <span class="s">&#39;mycluster01&#39;</span>
+
+
+<span class="c">#############################</span>
+<span class="c">### Serpent Specification ###</span>
+<span class="c">#############################</span>
+<span class="n">serpent_xsdata</span> <span class="o">=</span> <span class="s">&quot;/usr/share/serpent/xsdata/endf7.xsdata&quot;</span>
+<span class="c">#serpent_xsdata = &quot;/usr/share/serpent/xsdata/jeff311.xsdata&quot;</span>
+
+<span class="c"># The following two are only needed for burnup runs</span>
+<span class="n">serpent_decay_lib</span> <span class="o">=</span> <span class="s">&quot;/usr/share/serpent/xsdata/sss_endfb7.dec&quot;</span>
+<span class="n">serpent_fission_yield_lib</span> <span class="o">=</span> <span class="s">&quot;/usr/share/serpent/xsdata/sss_endfb7.nfy&quot;</span>
+<span class="c">#serpent_decay_lib = &quot;/usr/share/serpent/xsdata/sss_jeff311.dec&quot;</span>
+<span class="c">#serpent_fission_yield_lib = &quot;/usr/share/serpent/xsdata/sss_jeff311.nfy&quot;</span>
+</pre></div>
 </div>
 </div>
 
@@ -168,8 +649,17 @@ versions in char itself.  Current values may be seen
 <li><a class="reference internal" href="#general-specification">General Specification</a></li>
 <li><a class="reference internal" href="#isotope-tracking">Isotope Tracking</a></li>
 <li><a class="reference internal" href="#calculation-mode-templates">Calculation Mode Templates</a></li>
+<li><a class="reference internal" href="#unit-cell-sepcifications">Unit Cell Sepcifications</a></li>
+<li><a class="reference internal" href="#lattice-specification">Lattice Specification</a></li>
+<li><a class="reference internal" href="#mass-stream-information">Mass Stream Information</a></li>
+<li><a class="reference internal" href="#initial-isotopic-perturbations">Initial Isotopic Perturbations</a></li>
+<li><a class="reference internal" href="#crtiticality-control">Crtiticality Control</a></li>
+<li><a class="reference internal" href="#other-physical-parameters">Other Physical Parameters</a></li>
+<li><a class="reference internal" href="#remote-server-specification">Remote Server Specification</a></li>
+<li><a class="reference internal" href="#serpent-data-library-path-specification">Serpent Data Library Path Specification</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#bringing-it-all-together">Bringing it all together</a></li>
 </ul>
 
   <h4>Previous topic</h4>
