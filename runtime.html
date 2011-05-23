@@ -63,7 +63,10 @@ Options:
   -b, --burnup      Run the burnup calculation.
   -x, --xs          Run the cross-section generation calculation.
   -m, --delta-mass  Run the initial isotope sensitivity calculation.
-  -c, --clean       Cleans the reactor direactory of current files.
+  -N NPERT          Perturbation indices to calculate, in Python slice syntax.
+  -I ISOS           Isotopes to calculate.
+  -S NSENS          Sensitivity indices to calculate, in Python slice syntax.
+  -c, --clean       Cleans the reactor directory of current files.
   -l, --local       Run or Fetch files locally.
   -s, --server      Run or Fetch files from a remote server.
   -f, --fetch       Fetches files from the remote server. Does not run
@@ -88,8 +91,8 @@ It initializes the <tt class="docutils literal"><span class="pre">{reactor}.h5</
 <p>The run command encapsulates all of the logic on where to execute char (locally or on a server) and
 aggregates all of the run modes (burnup, cross-section generation, and isotopic sensitivity study)
 together in a single run command.</p>
-<p>If the above run modes are give withough the <tt class="docutils literal"><span class="pre">-r</span></tt> option, the transport will be run within this process
-rather than being subprocessed out appropriately.</p>
+<p>If the above run modes are give without the <tt class="docutils literal"><span class="pre">-r</span></tt> option, the transport will be run within this process
+rather than being subprocesses out appropriately.</p>
 <p>On the other hand, the <tt class="docutils literal"><span class="pre">-d</span></tt>  command will set up all required files to run, but skip the actual execution.
 This is most useful in debugging.</p>
 </div>
@@ -107,9 +110,9 @@ a fresh start.</p>
 <div class="section" id="remote-execution-s-server">
 <h2>Remote Execution (-s, &#8211;server)<a class="headerlink" href="#remote-execution-s-server" title="Permalink to this headline">¶</a></h2>
 <p>This command, along with <tt class="docutils literal"><span class="pre">-r</span></tt>, will run char and all of the serpent runs on a remote server machine.
-This server must have serpent and char and all of thier dependnecies installed as well.  The remote
+This server must have serpent and char and all of their dependencies installed as well.  The remote
 server information must be specified in the <tt class="docutils literal"><span class="pre">confchar</span></tt> file.</p>
-<p>This uses ssh and rsync on the backend, so an rsa key is highly recomended.</p>
+<p>This uses ssh and rsync on the backend, so an rsa key is highly recommended.</p>
 </div>
 <div class="section" id="remote-file-retrieval-f-fetch">
 <h2>Remote File Retrieval (-f, &#8211;fetch)<a class="headerlink" href="#remote-file-retrieval-f-fetch" title="Permalink to this headline">¶</a></h2>
@@ -126,17 +129,17 @@ calculation modes.</p>
 <p>The main purpose of char is to calculate neutron cross-sections for various reactor situations.
 This determines whether every isotope in the isotopic tracking list is available in serpent or not.
 If it is, then serpent is used to generate cross sections of the reaction types specified.
-If the isotope is not available in the serepent library, then the physical models are used along with a
+If the isotope is not available in the serpent library, then the physical models are used along with a
 high-resolution flux (calculated by serpent) to generate the cross-sections.</p>
 <p>This run mode requires that the burnup calculation be run as well.</p>
 </div>
 <div class="section" id="isotopic-sensitivity-study-m-delta-mass">
 <h2>Isotopic Sensitivity Study (-m, &#8211;delta-mass)<a class="headerlink" href="#isotopic-sensitivity-study-m-delta-mass" title="Permalink to this headline">¶</a></h2>
-<p>Char allows for the inital isotopic vector to be perturbed on a per-isotope basis.
-However, in general, pertubing all isotopes in not desirable because most isotopes do
+<p>Char allows for the initial isotopic vector to be perturbed on a per-isotope basis.
+However, in general, perturbing all isotopes in not desirable because most isotopes do
 not have a significant impact on the reactivity of the core.</p>
 <p>Still, for more complex reactors with a large number of input isotopics, determining which
-nuclides to perturb is not immeadiately appearent.  For exmaple, in an typical light water
+nuclides to perturb is not immediately apparent.  For example, in an typical light water
 reactor, U-235 is the isotope to perturb.  However, in a given fast reactor setup the answer
 is less obvious.</p>
 <p>The <tt class="docutils literal"><span class="pre">-m</span></tt> option seeks to rectify this by performing a linear sensitivity study for all
@@ -145,45 +148,77 @@ as if the <tt class="docutils literal"><span class="pre">-a</span></tt> analysis
 </div>
 <div class="section" id="analysis-a-analyze">
 <h2>Analysis (-a, &#8211;analyze)<a class="headerlink" href="#analysis-a-analyze" title="Permalink to this headline">¶</a></h2>
-<p>This mode performs analysis for a previosuly calculated database.</p>
+<p>This mode performs analysis for a previously calculated database.</p>
 <p>Currently, only the isotopic sensitivity study has an associated analysis mode.  Here
 for each isotope and for each perturbation, the standard deviation of the reactivity
 is calculated for each burn step.  The maximum of standard deviation over all burn steps
 and perturbations is takes as the metric for each isotopes.  The isotopes are then sorted
-by this metric.  The higher the value the more likely this isotopes should be incuded as
+by this metric.  The higher the value the more likely this isotopes should be included as
 a perturbation parameter to the database.  The maximal standard deviation for each isotope
 is printed to stdout.</p>
 </div>
+<div class="section" id="running-subsets-n-npert-i-isos-s-nsens">
+<h2>Running Subsets (-N NPERT, -I ISOS, -S NSENS)<a class="headerlink" href="#running-subsets-n-npert-i-isos-s-nsens" title="Permalink to this headline">¶</a></h2>
+<p>Often times, the database does not come out quite as expected and select sub-sets need to
+be re-executed.  Char provides a way to specific exactly which perturbation or sensitivity
+steps and which isotopes you wish to rerun at the command line.</p>
+<p>The perturbation steps that you want to run are given via the <tt class="docutils literal"><span class="pre">-N</span> <span class="pre">NPERT</span></tt> option.
+<tt class="docutils literal"><span class="pre">NPERT</span></tt> can be any integer or standard python slice (i.e. <tt class="docutils literal"><span class="pre">1:10</span></tt>).  For example,
+if you wanted to run the last burnup step, or the first five cross-section perturbations
+you would run:</p>
+<div class="highlight-python"><pre>char -N -1 -b defchar.py
+char -N 0:5 -x defchar.py</pre>
+</div>
+<p>Next, suppose you know that there is a problem with a specific nuclide or set of nuclides.
+You may rerun just these species by providing a comma separated list of isotopes to the
+<tt class="docutils literal"><span class="pre">-I</span> <span class="pre">ISOS</span></tt> option. Isotopes in the <tt class="docutils literal"><span class="pre">ISOS</span></tt> list may be of any, mixed form.  For example:</p>
+<div class="highlight-python"><pre># Rerun cross-sections for Hydrogen-1
+char -I H1 -x defchar.py
+
+# Rerun cross-sections for some actinides
+char -I U238,942390,AM242M,912370 -x defchar.py</pre>
+</div>
+<p>Similar to perturbations, you can also choose to rerun slices of a sensitivity study using
+the <tt class="docutils literal"><span class="pre">-S</span> <span class="pre">NSENS</span></tt> option:</p>
+<div class="highlight-python"><pre>char -S -1 -m defchar.py
+char -S 0:5 -m defchar.py</pre>
+</div>
+<p>Finally, you are free to combine these options to have a rather specific path to the
+data you wish to recalculate:</p>
+<div class="highlight-python"><pre># Oops, the first Hydrogen-1 point is messed up.
+char -N 0 -I H1 -x defchar.py</pre>
+</div>
+</div>
 <div class="section" id="process-discovery-and-timing-p-pid">
 <h2>Process Discovery and Timing (-p, &#8211;pid)<a class="headerlink" href="#process-discovery-and-timing-p-pid" title="Permalink to this headline">¶</a></h2>
-<p>This command find the process identity for a given run of char that has already been spwaned.
-This command may work in conjuction with <tt class="docutils literal"><span class="pre">-l</span></tt> and <tt class="docutils literal"><span class="pre">-s</span></tt> for local and remote discovery.</p>
+<p>This command find the process identity for a given run of char that has already been spawned.
+This command may work in conjunction with <tt class="docutils literal"><span class="pre">-l</span></tt> and <tt class="docutils literal"><span class="pre">-s</span></tt> for local and remote discovery.</p>
 <p>Additionally, it prints out the time that the has been spent executing this command.</p>
 </div>
 <div class="section" id="process-termination-k-kill">
 <h2>Process Termination (-k, &#8211;kill)<a class="headerlink" href="#process-termination-k-kill" title="Permalink to this headline">¶</a></h2>
 <p>This command attempts to kill any currently executing char process.  It may be run
-in conjuction with <tt class="docutils literal"><span class="pre">-l</span></tt> and <tt class="docutils literal"><span class="pre">-s</span></tt> for local and remote termination.</p>
+in conjunction with <tt class="docutils literal"><span class="pre">-l</span></tt> and <tt class="docutils literal"><span class="pre">-s</span></tt> for local and remote termination.</p>
 </div>
 <div class="section" id="current-working-directory-cwd">
 <h2>Current Working Directory (&#8211;cwd)<a class="headerlink" href="#current-working-directory-cwd" title="Permalink to this headline">¶</a></h2>
 <p>This command executes char within the current working directory, rather than creating a folder
-with the same name as the reactor and execting there.  This option is primarily used in char&#8217;s
+with the same name as the reactor and executing there.  This option is primarily used in char&#8217;s
 internals, but may be useful for debugging.</p>
 </div>
 <div class="section" id="graphical-user-interface-ui">
 <h2>Graphical User Interface (&#8211;ui)<a class="headerlink" href="#graphical-user-interface-ui" title="Permalink to this headline">¶</a></h2>
 <p>Char comes packaged with a graphical user interface.  Currently, this is used to
 inspect the database library and plot certain types of regular data.</p>
-<p>The GUI is based of of the Enthought Tool Suite.  Here is a screenshot, because people love those.</p>
-<a class="reference internal image-reference" href="_images/char_ui_screenshot.png"><img alt="_images/char_ui_screenshot.png" class="align-center" src="_images/char_ui_screenshot.png" style="width: 840.0px; height: 525.0px;" /></a>
+<p>The GUI is based of of the Enthought Tool Suite.  Here is a screen shot, because people love those.</p>
+<a class="reference internal image-reference" href="_images/char_ui_screenshot1.png"><img alt="_images/char_ui_screenshot1.png" class="align-center" src="_images/char_ui_screenshot1.png" style="width: 840.0px; height: 525.0px;" /></a>
 </div>
 <div class="section" id="database-testing-t-test">
 <h2>Database Testing (-t, &#8211;test)<a class="headerlink" href="#database-testing-t-test" title="Permalink to this headline">¶</a></h2>
 <p>Once the database has been created, it is a good idea to test that its data is valid
-before using the file.  To aid in this endevour, you may use the test command to run
+before using the file.  To aid in this endeavor, you may use the test command to run
 suite of tests on the database itself.  Unlike the other commands, you pass a path
-to the database in as char&#8217;s aregument, rather than a defchar.py file.  For example:</p>
+to the database in as char&#8217;s argument, rather than a defchar.py file.  For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">char</span> <span class="o">-</span><span class="n">t</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">reactor</span><span class="o">.</span><span class="n">h5</span>
 </pre></div>
 </div>
@@ -191,7 +226,7 @@ to the database in as char&#8217;s aregument, rather than a defchar.py file.  Fo
 </div>
 <div class="section" id="common-workflows">
 <h1>Common Workflows<a class="headerlink" href="#common-workflows" title="Permalink to this headline">¶</a></h1>
-<p>Below are some comon workflows that are used in to run char in various modes.</p>
+<p>Below are some common workflows that are used in to run char in various modes.</p>
 <p>Initialize a reactor:</p>
 <div class="highlight-python"><pre>char -i -c defchar.py</pre>
 </div>
@@ -217,6 +252,9 @@ char -a defchar.py</pre>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">char</span> <span class="o">--</span><span class="n">test</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">reactor</span><span class="o">.</span><span class="n">h5</span>
 </pre></div>
 </div>
+<p>Oops, the first Hydrogen-1 point is messed up. Fix locally:</p>
+<div class="highlight-python"><pre>char -N 0 -I H1 -x defchar.py</pre>
+</div>
 </div>
 
 
@@ -241,6 +279,7 @@ char -a defchar.py</pre>
 <li><a class="reference internal" href="#neutron-cross-section-generation-x-xs">Neutron Cross Section Generation (-x, &#8211;xs)</a></li>
 <li><a class="reference internal" href="#isotopic-sensitivity-study-m-delta-mass">Isotopic Sensitivity Study (-m, &#8211;delta-mass)</a></li>
 <li><a class="reference internal" href="#analysis-a-analyze">Analysis (-a, &#8211;analyze)</a></li>
+<li><a class="reference internal" href="#running-subsets-n-npert-i-isos-s-nsens">Running Subsets (-N NPERT, -I ISOS, -S NSENS)</a></li>
 <li><a class="reference internal" href="#process-discovery-and-timing-p-pid">Process Discovery and Timing (-p, &#8211;pid)</a></li>
 <li><a class="reference internal" href="#process-termination-k-kill">Process Termination (-k, &#8211;kill)</a></li>
 <li><a class="reference internal" href="#current-working-directory-cwd">Current Working Directory (&#8211;cwd)</a></li>
