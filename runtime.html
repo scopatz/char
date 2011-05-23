@@ -72,7 +72,8 @@ Options:
                     transport run. Sets -d.
   -k, --kill        Kills the current transport run. Sets -p.
   --cwd             Run char in the current working directory.
-  --ui              Launches the char ui.</pre>
+  --ui              Launches the char ui.
+  -t, --test        Tests an existing library for soundness.</pre>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">confchar</span></tt> argument is a path to a python file, typically called <tt class="docutils literal"><span class="pre">defchar.py</span></tt> that is used to
 specify required parameters of char.  The reason that this appears as a runtime argument is because
@@ -177,6 +178,16 @@ inspect the database library and plot certain types of regular data.</p>
 <p>The GUI is based of of the Enthought Tool Suite.  Here is a screenshot, because people love those.</p>
 <a class="reference internal image-reference" href="_images/char_ui_screenshot.png"><img alt="_images/char_ui_screenshot.png" class="align-center" src="_images/char_ui_screenshot.png" style="width: 840.0px; height: 525.0px;" /></a>
 </div>
+<div class="section" id="database-testing-t-test">
+<h2>Database Testing (-t, &#8211;test)<a class="headerlink" href="#database-testing-t-test" title="Permalink to this headline">¶</a></h2>
+<p>Once the database has been created, it is a good idea to test that its data is valid
+before using the file.  To aid in this endevour, you may use the test command to run
+suite of tests on the database itself.  Unlike the other commands, you pass a path
+to the database in as char&#8217;s aregument, rather than a defchar.py file.  For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">char</span> <span class="o">-</span><span class="n">t</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">reactor</span><span class="o">.</span><span class="n">h5</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="common-workflows">
 <h1>Common Workflows<a class="headerlink" href="#common-workflows" title="Permalink to this headline">¶</a></h1>
@@ -200,6 +211,10 @@ char -a defchar.py</pre>
 </div>
 <p>Start the user interface:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">char</span> <span class="o">--</span><span class="n">ui</span>
+</pre></div>
+</div>
+<p>Test the database file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">char</span> <span class="o">--</span><span class="n">test</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">reactor</span><span class="o">.</span><span class="n">h5</span>
 </pre></div>
 </div>
 </div>
@@ -230,6 +245,7 @@ char -a defchar.py</pre>
 <li><a class="reference internal" href="#process-termination-k-kill">Process Termination (-k, &#8211;kill)</a></li>
 <li><a class="reference internal" href="#current-working-directory-cwd">Current Working Directory (&#8211;cwd)</a></li>
 <li><a class="reference internal" href="#graphical-user-interface-ui">Graphical User Interface (&#8211;ui)</a></li>
+<li><a class="reference internal" href="#database-testing-t-test">Database Testing (-t, &#8211;test)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#common-workflows">Common Workflows</a></li>
@@ -280,7 +296,7 @@ char -a defchar.py</pre>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Anthony Scopatz.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
