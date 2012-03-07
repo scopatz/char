@@ -85,6 +85,9 @@ be run for. As such, it is a surrogate for the fluence.  For a light water react
 <li><strong>time_step</strong> (int or float): Time step by which to increment <tt class="docutils literal"><span class="pre">burn_time</span></tt>.  The code generally
 works best when <tt class="docutils literal"><span class="pre">(0</span> <span class="pre">==</span> <span class="pre">burn_time</span> <span class="pre">%</span> <span class="pre">time_step)</span></tt>.  It is usually better to guess smaller values
 for this parameter rather than larger ones.</li>
+<li><strong>burn_times</strong> (sequence): This is a list, array, or other sequence of burnup times, in days.
+If present, this overrides the <tt class="docutils literal"><span class="pre">burn_time</span></tt> and <tt class="docutils literal"><span class="pre">time_step</span></tt> variables.  Zero should
+be the first entry and it should be strictly monotonicly increasing.</li>
 <li><strong>email</strong> (str): An email address to send runtime updates to, &#8220;<a class="reference external" href="mailto:char&#37;&#52;&#48;zeon&#46;gov">char<span>&#64;</span>zeon<span>&#46;</span>gov</a>&#8221;.</li>
 <li><strong>scheduler</strong> (str): If present, this value specifices which scheduler to use.  Accepted values include
 an empty string <tt class="docutils literal"><span class="pre">''</span></tt> to indicate no scheduler and <tt class="docutils literal"><span class="pre">&quot;PBS&quot;</span></tt> to use the torque scheduler.</li>
@@ -111,47 +114,47 @@ is zero. You may set this arbitrarily high.</li>
 </pre></div>
 </div>
 </div>
-<div class="section" id="isotope-tracking">
-<span id="id1"></span><h2>Isotope Tracking<a class="headerlink" href="#isotope-tracking" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nuclide-tracking">
+<span id="id1"></span><h2>Nuclide Tracking<a class="headerlink" href="#nuclide-tracking" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>core_load_isos</strong> (list or path):  This parameter specifies all of the isotopes that may
-be present in the initial core loading of the reactor.  As such, it is these isotopes that
-char worries about transmuting from.</li>
-<li><strong>core_transmute_isos</strong> (list or path):  This parameter gives all of the nulcides that char
+<li><strong>core_load_nucs</strong> (list or path):  This parameter specifies all of the nuclides that may
+be present in the initial core loading of the reactor.  As such, it is these nuclides that
+Char worries about transmuting from.</li>
+<li><strong>core_transmute_nucs</strong> (list or path):  This parameter gives all of the nulcides that char
 tracks throughout a burnup-depeletion calcultion.  As such, it is this set that determines
-which isotopes are transmuted to.  Cross sections are calculated for all isotopes in this
+which nuclides are transmuted to.  Cross sections are calculated for all nuclides in this
 list.</li>
 </ul>
 <p>There are a few ways to instantiate these two variables.
 The preffered way is to import some of the predefined lists that have already been specified
 in char.  This prevents the user from having to build undo specification:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Set isotopes to track</span>
-<span class="kn">from</span> <span class="nn">char.iso_track</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">transmute</span>
-<span class="n">core_load_isos</span>      <span class="o">=</span> <span class="n">load</span>
-<span class="n">core_transmute_isos</span> <span class="o">=</span> <span class="n">transmute</span>
+<span class="kn">from</span> <span class="nn">char.nuc_track</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">transmute</span>
+<span class="n">core_load_nucs</span>      <span class="o">=</span> <span class="n">load</span>
+<span class="n">core_transmute_nucs</span> <span class="o">=</span> <span class="n">transmute</span>
 </pre></div>
 </div>
-<p>Valid lists that may be imported are <tt class="docutils literal"><span class="pre">load</span></tt>, <tt class="docutils literal"><span class="pre">transmute</span></tt>, <tt class="docutils literal"><span class="pre">actinides</span></tt>, <tt class="docutils literal"><span class="pre">uranium</span></tt>, and <tt class="docutils literal"><span class="pre">u235</span></tt>.
-The contents of these lists may be seen at
-<a class="reference external" href="https://github.com/scopatz/char/blob/master/char/iso_track.py">the github website</a>.</p>
+<p>Valid lists that may be imported are <tt class="docutils literal"><span class="pre">load</span></tt>, <tt class="docutils literal"><span class="pre">transmute</span></tt>, <tt class="docutils literal"><span class="pre">actinides</span></tt>, <tt class="docutils literal"><span class="pre">uranium</span></tt>,
+and <tt class="docutils literal"><span class="pre">u235</span></tt>.  The contents of these lists may be seen at
+<a class="reference external" href="https://github.com/scopatz/char/blob/master/char/nuc_track.py">the github website</a>.</p>
 <p>Moreover, the user can simply pass in python lists:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Set isotopes to track</span>
-<span class="n">core_load_isos</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;U235&#39;</span><span class="p">,</span> <span class="mi">922380</span><span class="p">,</span> <span class="s">&#39;O16&#39;</span><span class="p">,</span> <span class="mi">10010</span><span class="p">]</span>
-<span class="n">core_transmute_isos</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Am245&#39;</span><span class="p">,</span> <span class="s">&#39;PU240&#39;</span><span class="p">,</span> <span class="s">&#39;tc99&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+<span class="n">core_load_nucs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;U235&#39;</span><span class="p">,</span> <span class="mi">922380</span><span class="p">,</span> <span class="s">&#39;O16&#39;</span><span class="p">,</span> <span class="mi">10010</span><span class="p">]</span>
+<span class="n">core_transmute_nucs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Am245&#39;</span><span class="p">,</span> <span class="s">&#39;PU240&#39;</span><span class="p">,</span> <span class="s">&#39;tc99&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Additionally, suppose that you have file that is a whitespace separated list of isotope names.
 A string-valued path to this file may also be passed into these parameters.</p>
 <blockquote>
-<div><p><tt class="docutils literal"><span class="pre">isos_to_track.txt</span></tt>:</p>
+<div><p><tt class="docutils literal"><span class="pre">nucs_to_track.txt</span></tt>:</p>
 <div class="highlight-python"><pre>U235
 Th232 80160
 AM242m</pre>
 </div>
 <p>Relevant part of <tt class="docutils literal"><span class="pre">defchar.py</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Set isotopes to track</span>
-<span class="n">core_load_isos</span> <span class="o">=</span> <span class="s">&quot;/path/to/isos_to_track.txt&quot;</span>
-<span class="n">core_transmute_isos</span> <span class="o">=</span> <span class="s">&quot;/path/to/isos_to_track.txt&quot;</span>
+<span class="n">core_load_nucs</span> <span class="o">=</span> <span class="s">&quot;/path/to/nucs_to_track.txt&quot;</span>
+<span class="n">core_transmute_nucs</span> <span class="o">=</span> <span class="s">&quot;/path/to/nucs_to_track.txt&quot;</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -164,7 +167,7 @@ calculations.</li>
 <li><strong>xs_gen_template</strong> (str): An unformatted string template that is used for cross-section generation
 calculations.</li>
 </ul>
-<p>Like in <a class="reference internal" href="#isotope-tracking"><em>Isotope Tracking</em></a>, the preffered method of supplying templates is from pre-defined
+<p>Like in <a class="reference internal" href="#nuclide-tracking"><em>Nuclide Tracking</em></a>, the preffered method of supplying templates is from pre-defined
 versions in char itself.  Current values may be seen
 <a class="reference external" href="https://github.com/scopatz/char/blob/master/char/templates/lwr/serpent.py">at github</a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Load stock template string from char</span>
@@ -409,40 +412,40 @@ recomended in general.</p>
 <li><strong>cool_form_mass_weighted</strong> (bool): Coolant stream mass-weighted / atom-fraction flag.</li>
 </ul>
 </div>
-<div class="section" id="initial-isotopic-perturbations">
-<h2>Initial Isotopic Perturbations<a class="headerlink" href="#initial-isotopic-perturbations" title="Permalink to this headline">¶</a></h2>
-<p>There are two main (optional) ways to pertub isotopes.  The first is such that a pertubed isotopic
-vector shows up in the outer product perturbation set.</p>
+<div class="section" id="initial-nuclide-concentration-perturbations">
+<h2>Initial Nuclide Concentration Perturbations<a class="headerlink" href="#initial-nuclide-concentration-perturbations" title="Permalink to this headline">¶</a></h2>
+<p>There are two main (optional) ways to pertub nuclides.  The first is such that
+a pertubed isotopic vector shows up in the outer product perturbation set.</p>
 <ul class="simple">
-<li><strong>initial_{iso}</strong> ([sequence of] float):  The mass fraction value(s) of this isotope that
-should be replaced in the <tt class="docutils literal"><span class="pre">initial_heavy_metal</span></tt> stream.  The <tt class="docutils literal"><span class="pre">{iso}</span></tt> term specifices
-the name of the isotope to be pertubed in <tt class="docutils literal"><span class="pre">LLAAAM</span></tt>-form.</li>
+<li><strong>initial_{nuc}</strong> ([sequence of] float):  The mass fraction value(s) of this isotope that
+should be replaced in the <tt class="docutils literal"><span class="pre">initial_heavy_metal</span></tt> material.  The <tt class="docutils literal"><span class="pre">{nuc}</span></tt> term specifices
+the name of the isotope to be pertubed in <tt class="docutils literal"><span class="pre">zzaaam</span></tt>- or <tt class="docutils literal"><span class="pre">name</span></tt>-form (i.e. &#8216;U235&#8217; or 922350).</li>
 </ul>
 <p>For example, take the following hypothetical mass stream:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Initial heavy metal mass fraction distribution</span>
 <span class="n">initial_heavy_metal</span> <span class="o">=</span> <span class="p">{</span>
     <span class="mi">922340</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
     <span class="mi">922350</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span>
-    <span class="mi">922380</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span>
+    <span class="s">&quot;U238&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span>
     <span class="p">}</span>
 
 <span class="c"># Pertub some of these nuclides</span>
 <span class="n">initial_U234</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">]</span>
-<span class="n">initial_U235</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">]</span>
+<span class="n">initial_922350</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>The above would produce 6 initial heavy metal streams, one for each (U234, U235) combination, and
-generate burnups or cross sections for each of these mass streams.  The remaining isotopes (U238 here)
-would have their mass fractions altered to accomdated the perturbed mass stream.</p>
-<p>The second way that initial isotopes are perturbed is during the isotopic ssensitivity study (<tt class="docutils literal"><span class="pre">-m</span></tt>,
-calculation).  Every nuclide present in the <tt class="docutils literal"><span class="pre">initial_heavy_metal</span></tt> stream is pertubed by a set
+generate burnups or cross sections for each of these mass streams.  The remaining isotopes
+(U238 here) would have their mass fractions altered to accomdated the perturbed material.</p>
+<p>The second way that initial nuclides are perturbed is during the isotopic ssensitivity study
+(<tt class="docutils literal"><span class="pre">-m</span></tt>, calculation).  Every nuclide present in the <tt class="docutils literal"><span class="pre">initial_heavy_metal</span></tt> stream is pertubed by a set
 amounts.  These relative amounts are given via the following parameter.</p>
 <ul class="simple">
-<li><strong>sensitivity_mass_fractions</strong> ([sequence of] float): The relative amount by which to perturb each
-isotope in an isotopic sensitivity study, <tt class="docutils literal"><span class="pre">-m</span></tt>.</li>
+<li><strong>sensitivity_mass_fractions</strong> ([sequence of] float): The relative amount by which to
+perturb each nuclide in an isotopic sensitivity study, <tt class="docutils literal"><span class="pre">-m</span></tt>.</li>
 </ul>
-<p>An example that will perturb each isotopes initial amount by +/-10% from the initial value for every
-other pertubation is as follows:</p>
+<p>An example that will perturb each nuclide&#8217;s initial amount by +/-10% from the initial
+value for every other pertubation is as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">sensitivity_mass_fractions</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -647,12 +650,12 @@ chosen to comment some values out, but still wants to keep them around:</p>
   <ul>
 <li><a class="reference internal" href="#">Char Configuration</a><ul>
 <li><a class="reference internal" href="#general-specification">General Specification</a></li>
-<li><a class="reference internal" href="#isotope-tracking">Isotope Tracking</a></li>
+<li><a class="reference internal" href="#nuclide-tracking">Nuclide Tracking</a></li>
 <li><a class="reference internal" href="#calculation-mode-templates">Calculation Mode Templates</a></li>
 <li><a class="reference internal" href="#unit-cell-sepcifications">Unit Cell Sepcifications</a></li>
 <li><a class="reference internal" href="#lattice-specification">Lattice Specification</a></li>
 <li><a class="reference internal" href="#mass-stream-information">Mass Stream Information</a></li>
-<li><a class="reference internal" href="#initial-isotopic-perturbations">Initial Isotopic Perturbations</a></li>
+<li><a class="reference internal" href="#initial-nuclide-concentration-perturbations">Initial Nuclide Concentration Perturbations</a></li>
 <li><a class="reference internal" href="#crtiticality-control">Crtiticality Control</a></li>
 <li><a class="reference internal" href="#other-physical-parameters">Other Physical Parameters</a></li>
 <li><a class="reference internal" href="#remote-server-specification">Remote Server Specification</a></li>

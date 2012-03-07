@@ -42,6 +42,9 @@ General Specification
 * **time_step** (int or float): Time step by which to increment ``burn_time``.  The code generally
   works best when ``(0 == burn_time % time_step)``.  It is usually better to guess smaller values
   for this parameter rather than larger ones.
+* **burn_times** (sequence): This is a list, array, or other sequence of burnup times, in days. 
+  If present, this overrides the ``burn_time`` and ``time_step`` variables.  Zero should 
+  be the first entry and it should be strictly monotonicly increasing.
 * **email** (str): An email address to send runtime updates to, "char@zeon.gov".
 * **scheduler** (str): If present, this value specifices which scheduler to use.  Accepted values include 
   an empty string ``''`` to indicate no scheduler and ``"PBS"`` to use the torque scheduler.
@@ -68,17 +71,17 @@ For example, one may set up the general portion as follows::
     cpus_per_node = 4   # Processors per node
 
 
-.. _isotope-tracking:
+.. _nuclide-tracking:
 
 ----------------
-Isotope Tracking
+Nuclide Tracking
 ----------------
-* **core_load_isos** (list or path):  This parameter specifies all of the isotopes that may 
-  be present in the initial core loading of the reactor.  As such, it is these isotopes that 
-  char worries about transmuting from.
-* **core_transmute_isos** (list or path):  This parameter gives all of the nulcides that char
+* **core_load_nucs** (list or path):  This parameter specifies all of the nuclides that may 
+  be present in the initial core loading of the reactor.  As such, it is these nuclides that 
+  Char worries about transmuting from.
+* **core_transmute_nucs** (list or path):  This parameter gives all of the nulcides that char
   tracks throughout a burnup-depeletion calcultion.  As such, it is this set that determines 
-  which isotopes are transmuted to.  Cross sections are calculated for all isotopes in this
+  which nuclides are transmuted to.  Cross sections are calculated for all nuclides in this
   list.
 
 There are a few ways to instantiate these two variables.  
@@ -86,24 +89,24 @@ The preffered way is to import some of the predefined lists that have already be
 in char.  This prevents the user from having to build undo specification::
 
     # Set isotopes to track
-    from char.iso_track import load, transmute
-    core_load_isos      = load
-    core_transmute_isos = transmute
+    from char.nuc_track import load, transmute
+    core_load_nucs      = load
+    core_transmute_nucs = transmute
 
-Valid lists that may be imported are ``load``, ``transmute``, ``actinides``, ``uranium``, and ``u235``.
-The contents of these lists may be seen at 
-`the github website <https://github.com/scopatz/char/blob/master/char/iso_track.py>`_.
+Valid lists that may be imported are ``load``, ``transmute``, ``actinides``, ``uranium``, 
+and ``u235``.  The contents of these lists may be seen at 
+`the github website <https://github.com/scopatz/char/blob/master/char/nuc_track.py>`_.
 
 Moreover, the user can simply pass in python lists:: 
 
     # Set isotopes to track
-    core_load_isos = ['U235', 922380, 'O16', 10010]
-    core_transmute_isos = ['Am245', 'PU240', 'tc99', ...]
+    core_load_nucs = ['U235', 922380, 'O16', 10010]
+    core_transmute_nucs = ['Am245', 'PU240', 'tc99', ...]
 
 Additionally, suppose that you have file that is a whitespace separated list of isotope names.
 A string-valued path to this file may also be passed into these parameters.
 
-    ``isos_to_track.txt``::
+    ``nucs_to_track.txt``::
 
         U235 
         Th232 80160
@@ -112,8 +115,8 @@ A string-valued path to this file may also be passed into these parameters.
     Relevant part of ``defchar.py``::
 
         # Set isotopes to track
-        core_load_isos = "/path/to/isos_to_track.txt"
-        core_transmute_isos = "/path/to/isos_to_track.txt"
+        core_load_nucs = "/path/to/nucs_to_track.txt"
+        core_transmute_nucs = "/path/to/nucs_to_track.txt"
 
 
 .. _calc_mode_templates:
@@ -126,7 +129,7 @@ Calculation Mode Templates
 * **xs_gen_template** (str): An unformatted string template that is used for cross-section generation
   calculations.
 
-Like in :ref:`isotope-tracking`, the preffered method of supplying templates is from pre-defined
+Like in :ref:`nuclide-tracking`, the preffered method of supplying templates is from pre-defined
 versions in char itself.  Current values may be seen 
 `at github <https://github.com/scopatz/char/blob/master/char/templates/lwr/serpent.py>`_::
 
@@ -365,15 +368,15 @@ recomended in general.
 * **cool_form_mass_weighted** (bool): Coolant stream mass-weighted / atom-fraction flag.
 
 
-------------------------------
-Initial Isotopic Perturbations
-------------------------------
-There are two main (optional) ways to pertub isotopes.  The first is such that a pertubed isotopic
-vector shows up in the outer product perturbation set.
+-------------------------------------------
+Initial Nuclide Concentration Perturbations
+-------------------------------------------
+There are two main (optional) ways to pertub nuclides.  The first is such that 
+a pertubed isotopic vector shows up in the outer product perturbation set.
 
-* **initial_{iso}** ([sequence of] float):  The mass fraction value(s) of this isotope that 
-  should be replaced in the ``initial_heavy_metal`` stream.  The ``{iso}`` term specifices 
-  the name of the isotope to be pertubed in ``LLAAAM``-form.
+* **initial_{nuc}** ([sequence of] float):  The mass fraction value(s) of this isotope that 
+  should be replaced in the ``initial_heavy_metal`` material.  The ``{nuc}`` term specifices 
+  the name of the isotope to be pertubed in ``zzaaam``- or ``name``-form (i.e. 'U235' or 922350).
 
 For example, take the following hypothetical mass stream::
 
@@ -381,27 +384,27 @@ For example, take the following hypothetical mass stream::
     initial_heavy_metal = {
         922340: 0.01,
         922350: 0.04,
-        922380: 0.95,
+        "U238": 0.95,
         }
 
     # Pertub some of these nuclides
     initial_U234 = [0.01, 0.015]
-    initial_U235 = [0.02, 0.04, 0.06]
+    initial_922350 = [0.02, 0.04, 0.06]
 
 The above would produce 6 initial heavy metal streams, one for each (U234, U235) combination, and
-generate burnups or cross sections for each of these mass streams.  The remaining isotopes (U238 here)
-would have their mass fractions altered to accomdated the perturbed mass stream.
+generate burnups or cross sections for each of these mass streams.  The remaining isotopes 
+(U238 here) would have their mass fractions altered to accomdated the perturbed material.
 
 
-The second way that initial isotopes are perturbed is during the isotopic ssensitivity study (``-m``, 
-calculation).  Every nuclide present in the ``initial_heavy_metal`` stream is pertubed by a set 
+The second way that initial nuclides are perturbed is during the isotopic ssensitivity study 
+(``-m``, calculation).  Every nuclide present in the ``initial_heavy_metal`` stream is pertubed by a set 
 amounts.  These relative amounts are given via the following parameter.
 
-* **sensitivity_mass_fractions** ([sequence of] float): The relative amount by which to perturb each
-  isotope in an isotopic sensitivity study, ``-m``.
+* **sensitivity_mass_fractions** ([sequence of] float): The relative amount by which to 
+  perturb each nuclide in an isotopic sensitivity study, ``-m``.
 
-An example that will perturb each isotopes initial amount by +/-10% from the initial value for every
-other pertubation is as follows::
+An example that will perturb each nuclide's initial amount by +/-10% from the initial 
+value for every other pertubation is as follows::
 
     sensitivity_mass_fractions = [1.1, 0.9]
 
